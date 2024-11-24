@@ -15,7 +15,7 @@ print(sum_part_1)
 
 ### Part 2
 
-## Way 1
+## Way 1 (faster computationally)
 # Starting time
 start_time = time.time()
 
