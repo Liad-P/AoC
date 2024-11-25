@@ -19,22 +19,30 @@ print(sum_part_1)
 # Starting time
 start_time = time.time()
 
+# the key is the mod of the partial sum
+# the value is the (partial sum, index of that partial sum in data)
 tracking_sums: dict[int, (int, int)] = {}
 sum_part2: int = 0
 pairs_of_mods: list[(int, int, int)] = []
 
+# go through each patial sum and get all the pairs of partial sums that have the same modulo of the sum of a total round of data
 for i in range(len(data)):
+    # if there is already a value in the dict for that modulo then you know there is a pair of patial sums with the same modulo
     if sum_part2 % sum_part_1 - 1 != tracking_sums.get(sum_part2 % sum_part_1, sum_part2 % sum_part_1 - 1):
         pairs_of_mods.append((sum_part2, tracking_sums[sum_part2 % sum_part_1][0], tracking_sums[sum_part2 % sum_part_1][1]))
+    # add modulo of patial sum to the dict
     tracking_sums[sum_part2 % sum_part_1] = (sum_part2, i) 
     sum_part2 += int(data[i])
 
+# get the initial values for the comparison
 min_difference_in_sums_pair: tuple =pairs_of_mods[0]
 min_difference_in_sums:int = abs(min_difference_in_sums_pair[0]- min_difference_in_sums_pair[1])
 pairs_of_mods.remove(pairs_of_mods[0])
 
 for x,y,i in pairs_of_mods:
     number_of_fullsums_btwn_matched: int = abs(x-y)
+    # if the the difference in the current pair is smaller than the intial one we know that this pair will be hit first. 
+    # Or if the difference is the same but the initial index for the first partial sum comes first that will be hit first
     if number_of_fullsums_btwn_matched < min_difference_in_sums or (number_of_fullsums_btwn_matched == min_difference_in_sums and i < min_difference_in_sums_pair[2]):
         min_difference_in_sums = number_of_fullsums_btwn_matched
         min_difference_in_sums_pair = (x,y,i)
