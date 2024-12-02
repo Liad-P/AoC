@@ -78,3 +78,4 @@ executable haskell
     default-language: Haskell2010
 
     other-modules:  AoC2024Day1
+                    , AoC2024Day2
