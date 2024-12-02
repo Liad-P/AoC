@@ -51,6 +51,8 @@ part1 = do
   records <- getArrayOfRecords getReportFromLine "/home/liad/code/Side_Projects/AoC/AoC2024/haskell/app/inputday2.txt"
   print $ performCalcOnArray calculateIfSafe records
 
+-- Part 2 V1
+
 calculateIfSafePart2 :: [Int] -> Bool
 calculateIfSafePart2 [] = True
 calculateIfSafePart2 [_] = True
@@ -82,3 +84,33 @@ part2 :: IO ()
 part2 = do
   records <- getArrayOfRecords getReportFromLine "/home/liad/code/Side_Projects/AoC/AoC2024/haskell/app/inputday2.txt"
   print $ performCalcOnArray calculateIfSafePart2 records
+
+-- Part 2 V2:
+
+removeValueAtIndex :: [Int] -> Int -> [Int]
+removeValueAtIndex input i = take i input ++ drop (i + 1) input
+
+-- The same as isNElementsSafe
+-- Bool input parameter represents isIncreasing (if true treate it as the array is increase, if false treate it as decreasing)
+isArraySafe :: [Int] -> Bool -> Bool
+isArraySafe [] _ = True
+isArraySafe [_] _ = True
+isArraySafe (x1 : x2 : xs) True
+  | x2 > x1 && abs (x1 - x2) >= 1 && abs (x1 - x2) <= 3 = isArraySafe (x2 : xs) True
+  | otherwise = False
+isArraySafe (x1 : x2 : xs) False
+  | x2 < x1 && abs (x1 - x2) >= 1 && abs (x1 - x2) <= 3 = isArraySafe (x2 : xs) False
+  | otherwise = False
+
+calculateIfSafePart2V2 :: Int -> [Int] -> Bool
+calculateIfSafePart2V2 indexToRemove input
+  | length input == indexToRemove = False
+  | isArraySafe (removeValueAtIndex input indexToRemove) True = True
+  | isArraySafe (removeValueAtIndex input indexToRemove) False = True
+  | calculateIfSafePart2V2 (indexToRemove + 1) input = True
+  | otherwise = False
+
+part2V2 :: IO ()
+part2V2 = do
+  records <- getArrayOfRecords getReportFromLine "/home/liad/code/Side_Projects/AoC/AoC2024/haskell/app/inputday2.txt"
+  print $ performCalcOnArray (calculateIfSafePart2V2 0) records
