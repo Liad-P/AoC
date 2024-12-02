@@ -48,7 +48,7 @@ performCalcOnArray filderCond inputArray = length $ filter filderCond inputArray
 
 part1 :: IO ()
 part1 = do
-  records <- getArrayOfRecords getReportFromLine "/home/liad/code/Side_Projects/AoC/AoC2024/haskell/app/inputday2.txt"
+  records <- getArrayOfRecords getReportFromLine "input/inputday2.txt"
   print $ performCalcOnArray calculateIfSafe records
 
 -- Part 2 V1
@@ -82,7 +82,7 @@ isNElementsSafePart2 (x1 : x2 : x3 : xs) False hasUsedProblemDampener
 
 part2 :: IO ()
 part2 = do
-  records <- getArrayOfRecords getReportFromLine "/home/liad/code/Side_Projects/AoC/AoC2024/haskell/app/inputday2.txt"
+  records <- getArrayOfRecords getReportFromLine "input/inputday2.txt"
   print $ performCalcOnArray calculateIfSafePart2 records
 
 -- Part 2 V2:
@@ -112,5 +112,5 @@ calculateIfSafePart2V2 indexToRemove input
 
 part2V2 :: IO ()
 part2V2 = do
-  records <- getArrayOfRecords getReportFromLine "/home/liad/code/Side_Projects/AoC/AoC2024/haskell/app/inputday2.txt"
+  records <- getArrayOfRecords getReportFromLine "input/inputday2.txt"
   print $ performCalcOnArray (calculateIfSafePart2V2 0) records

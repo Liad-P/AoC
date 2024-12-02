@@ -39,7 +39,7 @@ getSumOfDifferences (leftNums, rightNums) =
 
 part1 :: IO ()
 part1 = do
-  (leftNums, rightNums) <- accumulateFromFileWithParser "/home/liad/code/Side_Projects/AoC/AoC2024/haskell/app/inputday1.txt" getLeftAndRightOfLine
+  (leftNums, rightNums) <- accumulateFromFileWithParser "input/inputday1.txt" getLeftAndRightOfLine
   let leftNumsSorted = sort leftNums
   let rightNumsSorted = sort rightNums
   let summedDifference = getSumOfDifferences (leftNumsSorted, rightNumsSorted)
@@ -47,7 +47,7 @@ part1 = do
 
 doCalculationOnLeftAndRightColumn :: (([Int], [Int]) -> Int) -> IO ()
 doCalculationOnLeftAndRightColumn calulation = do
-  (leftNums, rightNums) <- accumulateFromFileWithParser "/home/liad/code/Side_Projects/AoC/AoC2024/haskell/app/inputday1.txt" getLeftAndRightOfLine
+  (leftNums, rightNums) <- accumulateFromFileWithParser "input/inputday1.txt" getLeftAndRightOfLine
   let leftNumsSorted = sort leftNums
   let rightNumsSorted = sort rightNums
   let summedDifference = calulation (leftNumsSorted, rightNumsSorted)
