@@ -46,9 +46,6 @@ getArrayOfRecords parserInput filePath = do
 performCalcOnArray :: ([Int] -> Bool) -> [[Int]] -> Int
 performCalcOnArray filderCond inputArray = length $ filter filderCond inputArray
 
--- xx :: ([Int] -> Bool) -> [[Int]] -> [[Int]]
--- xx filderCond inputArray = filter filderCond inputArray
-
 part1 :: IO ()
 part1 = do
   records <- getArrayOfRecords getReportFromLine "/home/liad/code/Side_Projects/AoC/AoC2024/haskell/app/inputday2.txt"
@@ -84,5 +81,4 @@ isNElementsSafePart2 (x1 : x2 : x3 : xs) False hasUsedProblemDampener
 part2 :: IO ()
 part2 = do
   records <- getArrayOfRecords getReportFromLine "/home/liad/code/Side_Projects/AoC/AoC2024/haskell/app/inputday2.txt"
-  --   print $ reverse $ (\x -> (x, calculateIfSafePart2 x)) <$> records
   print $ performCalcOnArray calculateIfSafePart2 records
