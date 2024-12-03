@@ -37,31 +37,33 @@ part1 = do
 
 -- testingPart2 = parse inputParserPart2 "" "xmul(2,4)&mul[3,7]!^don't()_mul(5,5)+mul(32,64](mul(11,8)undo()?mul(8,5))"
 
--- part2 :: IO ()
--- part2 = do
---   content <- readFile "input/inputday3.txt"
---   let listOfMultiples =
---         ( case (parse inputParser "" content) of
---             Left _ -> [(0, 0)]
---             Right res -> res
---         )
---   let result = map (\(x1, x2) -> x1 * x2) listOfMultiples
---   print (sum result)
+part2 :: IO ()
+part2 = do
+  content <- readFile "input/inputday3.txt"
+  let filteredContent = concat (parseSectionsBetweenDoAndDont content)
+  let listOfMultiples =
+        ( case (parse inputParser "" filteredContent) of
+            Left _ -> [(0, 0)]
+            Right res -> res
+        )
+  let result = map (\(x1, x2) -> x1 * x2) listOfMultiples
+  print (sum result)
 
--- parseFirstPartBeforeFirstDoOrDont :: String -> String
--- parseFirstPartBeforeFirstDoOrDont inputText =
---   case targetString of
---     Left _ -> ""
---     Right res -> res
---   where
---     targetString = parse (manyTill anyToken ((try (lookAhead (string "don't()"))) <|> (try $ lookAhead (string "do()")))) "" inputText
+parseSectionsBetweenDoAndDont :: String -> [String]
+parseSectionsBetweenDoAndDont inputText = targetStringSplitByDont
+  where
+    targetStringSplitByDont = map (\str -> getStringBeforeDont str) targetStringSplitByDo
+    targetStringSplitByDo = case (parse (manyTill getCharactersBetweenDos eof) "" inputText) of
+      Left _ -> [""]
+      Right res -> res
+    getStringBeforeDont :: String -> String
+    getStringBeforeDont inputString =
+      head
+        ( case (parse (manyTill getCharactersBeforeDont eof) "" inputString) of
+            Left _ -> [""]
+            Right res -> res
+        )
+    getCharactersBetweenDos = manyTill anyToken (try eof <|> try (string "do()" >> pure ()))
+    getCharactersBeforeDont = manyTill anyToken (try eof <|> try (string "don't()" >> pure ()))
 
--- parseSectionsBetweenDoAndDont :: String -> [String]
--- parseSectionsBetweenDoAndDont inputText =
---   case targetString of
---     Left _ -> [""]
---     Right res -> res
---   where
---     targetString = parse (many (between (try $ string "do()") (try $ string "don't()") (many anyToken))) "" inputText
-
--- testingPart2Something = parseSectionsBetweenDoAndDont "xmul(2,4)&mul[3,7]!^don't()_mul(5,5)+mul(32,64](mul(11,8)undo()?mul(8,5))"
+testingPart2Something = parseSectionsBetweenDoAndDont "xmul(2,4)&mul[3,7]!^don't()_mul(5,5)+mul(32,64](mul(11,8)undo()?mul(8,5))xmul(2,4)&mul[3,7]!^don't()_mul(5,5)+mul(32,64](mul(11,8)undo()?mul(8,5))"
