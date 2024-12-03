@@ -20,9 +20,8 @@ inputParser = do
   listOfMultiples <- sepEndBy (try mulParser) (try notNeededText)
   pure listOfMultiples
 
+notNeededText :: Parser String
 notNeededText = manyTill anyToken (try $ lookAhead mulParser)
-
-testing = parse inputParser "" "xmul(2,4)%&mul[3,7]!@^do_not_mul(5,5)+mul(32,64]then(mul(11,8)mul(8,5))"
 
 part1 :: IO ()
 part1 = do
@@ -34,8 +33,6 @@ part1 = do
         )
   let result = map (\(x1, x2) -> x1 * x2) listOfMultiples
   print (sum result)
-
--- testingPart2 = parse inputParserPart2 "" "xmul(2,4)&mul[3,7]!^don't()_mul(5,5)+mul(32,64](mul(11,8)undo()?mul(8,5))"
 
 part2 :: IO ()
 part2 = do
@@ -63,7 +60,7 @@ parseSectionsBetweenDoAndDont inputText = targetStringSplitByDont
             Left _ -> [""]
             Right res -> res
         )
+    getCharactersBetweenDos :: Parser String
     getCharactersBetweenDos = manyTill anyToken (try eof <|> try (string "do()" >> pure ()))
+    getCharactersBeforeDont :: Parser String
     getCharactersBeforeDont = manyTill anyToken (try eof <|> try (string "don't()" >> pure ()))
-
-testingPart2Something = parseSectionsBetweenDoAndDont "xmul(2,4)&mul[3,7]!^don't()_mul(5,5)+mul(32,64](mul(11,8)undo()?mul(8,5))xmul(2,4)&mul[3,7]!^don't()_mul(5,5)+mul(32,64](mul(11,8)undo()?mul(8,5))"
