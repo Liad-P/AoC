@@ -79,3 +79,4 @@ executable haskell
 
     other-modules:  AoC2024Day1
                     , AoC2024Day2
+                    , AoC2024Day3
