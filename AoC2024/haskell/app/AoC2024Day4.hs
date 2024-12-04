@@ -73,20 +73,6 @@ hasXmas point inputString =
     topRightToBottomLeftString = getStringFromPath $ map (add2CoordsV2 point) topRightToBottomLeft
     desiredString = "MS"
 
--- testCase =
---   [ "MMMSXXMASM",
---     "MSAMXMSMSA",
---     "AMXSXMAAMM",
---     "MSAMASMSMX",
---     "XMASAMXAMM",
---     "XXAMMXXAMA",
---     "SMSMSASXSS",
---     "SAXAMASAAA",
---     "MAMMMXMMMM",
---     "MXMXAXMASX"
---   ]
-
--- test_hasXmas = hasXmas (2, 1) testCase
 
 countXmaxPart2 :: [String] -> Int
 countXmaxPart2 inputString = iterateAndApplyFunctionToEachElement inputString
@@ -104,8 +90,6 @@ countXmaxPart2 inputString = iterateAndApplyFunctionToEachElement inputString
               )
               ((1, rowNum), 0)
               (drop 1 $ take (length (inputString !! rowNum) - 1) (inputString !! rowNum))
-
--- test_countXmaxPart2 = countXmaxPart2 testCase
 
 part2 :: IO ()
 part2 = do
