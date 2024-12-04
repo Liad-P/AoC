@@ -57,3 +57,58 @@ part1 = do
   fileContent <- readFile "input/inputday4.txt"
   let fileLines = lines fileContent
   print $ getCountOfXMAS fileLines
+
+-- part 2
+
+hasXmas :: (Int, Int) -> [String] -> Bool
+hasXmas point inputString =
+  (topLeftToBottomRightString == desiredString || topLeftToBottomRightString == reverse desiredString)
+    && (topRightToBottomLeftString == desiredString || topRightToBottomLeftString == reverse desiredString)
+  where
+    topLeftToBottomRight = [(-1, 1), (1, -1)]
+    topRightToBottomLeft = [(-1, -1), (1, 1)]
+    getStringFromPath :: [(Int, Int)] -> String
+    getStringFromPath path = catMaybes (foldl (\strAcc curCoord -> strAcc ++ [getCharacterUsingCoordsV2 inputString curCoord]) [] path)
+    topLeftToBottomRightString = getStringFromPath $ map (add2CoordsV2 point) topLeftToBottomRight
+    topRightToBottomLeftString = getStringFromPath $ map (add2CoordsV2 point) topRightToBottomLeft
+    desiredString = "MS"
+
+-- testCase =
+--   [ "MMMSXXMASM",
+--     "MSAMXMSMSA",
+--     "AMXSXMAAMM",
+--     "MSAMASMSMX",
+--     "XMASAMXAMM",
+--     "XXAMMXXAMA",
+--     "SMSMSASXSS",
+--     "SAXAMASAAA",
+--     "MAMMMXMMMM",
+--     "MXMXAXMASX"
+--   ]
+
+-- test_hasXmas = hasXmas (2, 1) testCase
+
+countXmaxPart2 :: [String] -> Int
+countXmaxPart2 inputString = iterateAndApplyFunctionToEachElement inputString
+  where
+    iterateAndApplyFunctionToEachElement inputString = snd $ foldl (\(i, sumOfXmas) elem -> (i + 1, sumOfXmas + goThroughRow i)) (1, 0) (drop 1 $ take (length inputString - 1) inputString)
+      where
+        goThroughRow :: Int -> Int
+        goThroughRow rowNum =
+          snd $
+            foldl
+              ( \((x, y), count) elem ->
+                  if elem == 'A' && hasXmas (x, y) inputString
+                    then ((x + 1, y), count + 1)
+                    else ((x + 1, y), count)
+              )
+              ((1, rowNum), 0)
+              (drop 1 $ take (length (inputString !! rowNum) - 1) (inputString !! rowNum))
+
+-- test_countXmaxPart2 = countXmaxPart2 testCase
+
+part2 :: IO ()
+part2 = do
+  fileContent <- readFile "input/inputday4.txt"
+  let fileLines = lines fileContent
+  print $ countXmaxPart2 fileLines
