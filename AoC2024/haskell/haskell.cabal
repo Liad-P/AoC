@@ -81,3 +81,5 @@ executable haskell
                     , AoC2024Day2
                     , AoC2024Day3
                     , AoC2024Day4
+                    , AoC2024Day5
+                    , AoC2024Day6
