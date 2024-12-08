@@ -60,3 +60,35 @@ part1 = do
     let fileLines = lines fileContent
     -- let fileLines = testCase
     print $ length $ getAntiNodesFromInputString fileLines
+
+
+-- Part 2:
+
+getAntiNodesPart2:: [String] -> (Point,Point) -> [Point]
+getAntiNodesPart2 inputStrings (Point (x1,y1),Point (x2,y2))  = (getAntiNodesToOneSide [(Point (x1,y1))] (x1-x2, y1-y2) inputStrings) ++ (getAntiNodesToOneSide [(Point (x2,y2))] (x2 -x1, y2-y1) inputStrings)
+
+getAntiNodesToOneSide:: [Point] -> (Int,Int) -> [String] -> [Point] 
+getAntiNodesToOneSide points (deltax, deltay) inputStrings 
+    | isPointOutOfBound inputStrings nextPoint = points
+    | otherwise = getAntiNodesToOneSide (points ++ [nextPoint]) (deltax, deltay) inputStrings
+    where
+        getXFromPoint (Point(x,y)) = x
+        getYFromPoint (Point(x,y)) = y
+        nextPoint = Point ((getXFromPoint $ last points) + deltax, (getYFromPoint $ last points) + deltay)
+
+getAntiNodesFromInputStringPart2:: [String] -> [Point]
+getAntiNodesFromInputStringPart2 inputStrings = 
+    let charNodes = getCharactersAndCoord inputStrings
+        charNodesGrouped = getPointsByChar charNodes
+        antiNodes = foldl (\acc g -> acc ++ (map (getAntiNodesPart2 inputStrings) (getPossiblePairsOfPoints g []))) [] charNodesGrouped
+        antiNodesFlattened = nub $ concat antiNodes
+        antiNodesInMap = filter (\x -> not (isPointOutOfBound inputStrings x)) antiNodesFlattened
+    in antiNodesInMap
+
+
+part2 :: IO ()
+part2 = do
+    fileContent <- readFile "input/inputday8.txt"
+    let fileLines = lines fileContent
+    -- let fileLines = testCase
+    print $ length $ getAntiNodesFromInputStringPart2 fileLines
