@@ -1,7 +1,7 @@
 module AoC2024Day6 where
 
 import Control.Monad (guard)
-import Data.List (findIndex, nub)
+import Data.List (findIndex, nub, isInfixOf)
 import Data.Maybe (fromJust)
 import Debug.Trace (trace)
 
@@ -115,43 +115,21 @@ findCharInRowFromPointAndDirection inputString (Point (x, y)) RIGHT targetChar =
   where
     findCoordOfChar = findIndex (== targetChar) $ foldl (\listOfChar i -> listOfChar ++ [getCharacterFromPoint inputString (Point (i, y))]) [] [x + 1 .. length (head inputString) - 1]
 
--- getIfPossibleInfiniteLoop :: [String] -> Point -> Direction -> Bool
--- -- ran into Top Left
--- getIfPossibleInfiniteLoop inputString (Point (x, y)) UP
---   | isPointOutOfBound inputString Point (x, y + 1) || isPointOutOfBound inputString Point (x - 1, y) = False
---   | findCharInRowFromPointAndDirection inputString (Point (x, y + 1)) RIGHT '#' == Nothing = False
---   | findCharInRowFromPointAndDirection inputString (Point (x - 1, y)) DOWN '#' == Nothing = False
---   | isPointBetweenBLandBR || isPointBetweenBLandBR = False
---   | otherwise = True
---   where
---     Point (BLx, BLy) = fromJust $ findCharInRowFromPointAndDirection inputString (Point (x - 1, y)) DOWN '#'
---     Point (TRx, TRy) = fromJust $ findCharInRowFromPointAndDirection inputString (Point (x, y + 1)) RIGHT '#'
-
---     isPointBetweenBLandBR = case findCharInRowFromPointAndDirection inputString (Point (BLx, BLy + 1)) RIGHT '#' of
---       Nothing -> False
---       Just (Point (xpoint, ypoint)) -> if xpoint < TRx then True else False
---     isPointBetweenTRandBR = case findCharInRowFromPointAndDirection inputString (Point (TRx, TRy)) DOWN '#' of
---       Nothing -> False
---       Just (Point (xpoint, ypoint)) -> if ypoint < TRy then True else False
-
 -- X - is the new obstical
-walkGuardPart2 :: Guard -> [String] -> [Point] -> [Point]
-walkGuardPart2 guard inputStrings path
-  | isPointOutOfBound inputStrings $ getGuardsNextPosition guard = path
-  | (getCharacterFromPoint inputStrings $ getGuardsNextPosition guard) == '#' = walkGuard (changeGuardDirection guard) inputStrings path
-  | otherwise = walkGuard (moveGuardForward guard) inputStrings (path ++ [getGuardsNextPosition guard])
-
 -- True = Infiniteloop, False = finite loop
-walkGuardWithNewObstructionInfinteLoop :: Guard -> [String] -> [Point] -> [Direction] -> Bool
+walkGuardWithNewObstructionInfinteLoop :: Guard -> [String] -> [Point] -> [(Point,Direction)] -> Bool
 walkGuardWithNewObstructionInfinteLoop guard inputStrings path directionHitNewObstruction
   | isPointOutOfBound inputStrings $ getGuardsNextPosition guard = False
-  | (getCharacterFromPoint inputStrings $ getGuardsNextPosition guard) == 'X' && (getGuardDirection guard) `elem` directionHitNewObstruction = True
-  | (getCharacterFromPoint inputStrings $ getGuardsNextPosition guard) == 'X' = walkGuardWithNewObstructionInfinteLoop (changeGuardDirection guard) inputStrings path (directionHitNewObstruction ++ [getGuardDirection guard])
-  | (getCharacterFromPoint inputStrings $ getGuardsNextPosition guard) == '#' = walkGuardWithNewObstructionInfinteLoop (changeGuardDirection guard) inputStrings path directionHitNewObstruction
+  -- | (getCharacterFromPoint inputStrings $ getGuardsNextPosition guard) `elem` ['X', '#'] && (getGuardsNextPosition guard,getGuardDirection guard) `elem` last4ObstructionHits = trace ("Detected loop with: " ++ show last4ObstructionHits) True
+  -- | (getCharacterFromPoint inputStrings $ getGuardsNextPosition guard) `elem` ['X', '#'] && isInfiniteLoop =  trace ("Detected loop with: " ++ (show last4ObstructionHits) ++ " here is the current things: " ++ (show $ (getGuardsNextPosition guard,getGuardDirection guard))) True
+  | (getCharacterFromPoint inputStrings $ getGuardsNextPosition guard) `elem` ['X', '#'] && isInfiniteLoop = trace ("Detected loop with: " ++ (show directionHitNewObstruction) ++ " here is the current things: " ++ (show $ (getGuardsNextPosition guard,getGuardDirection guard))) True
+  | (getCharacterFromPoint inputStrings $ getGuardsNextPosition guard) `elem` ['X', '#'] = walkGuardWithNewObstructionInfinteLoop (changeGuardDirection guard) inputStrings path (directionHitNewObstruction ++ [(getGuardsNextPosition guard,getGuardDirection guard)])
   | otherwise = walkGuardWithNewObstructionInfinteLoop (moveGuardForward guard) inputStrings (path ++ [getGuardsNextPosition guard]) directionHitNewObstruction
   where
     getGuardDirection :: Guard -> Direction
     getGuardDirection (MkGuard _ guardDir) = guardDir
+    last4ObstructionHits = if length directionHitNewObstruction > 4 then drop (length directionHitNewObstruction - 4) directionHitNewObstruction else directionHitNewObstruction
+    isInfiniteLoop = if length last4ObstructionHits == 4 then (last4ObstructionHits `isInfixOf` (take (length directionHitNewObstruction -4) directionHitNewObstruction)) else False
 
 putObstructionAtPoint :: [String] -> Point -> Char -> [String]
 putObstructionAtPoint inputStrings (Point (x, y)) char = replaceElementAtIndex inputStrings y newRow
@@ -161,22 +139,23 @@ putObstructionAtPoint inputStrings (Point (x, y)) char = replaceElementAtIndex i
     replaceElementAtIndex :: [a] -> Int -> a -> [a]
     replaceElementAtIndex input index newElement = fst (splitAt index input) ++ [newElement] ++ tail (snd (splitAt index input))
 
-iterateThroughObstructionsAlongPath :: [String] -> Guard -> Int -> Int
-iterateThroughObstructionsAlongPath inputStrings guard count
-  | isPointOutOfBound inputStrings $ getGuardsNextPosition guard = count
-  | isInfiniteLoop = iterateThroughObstructionsAlongPath inputStrings (moveGuardForward currentGuard) (trace ("Incrementing count to " ++ show (count + 1)) (count + 1))
-  | otherwise = iterateThroughObstructionsAlongPath inputStrings (moveGuardForward currentGuard) count
+iterateThroughObstructionsAlongPath :: [String] -> Guard -> [Point] -> [Point]
+iterateThroughObstructionsAlongPath inputStrings guard pointsOfInfiniteLoop
+  | isPointOutOfBound inputStrings $ getGuardsNextPosition currentGuard = pointsOfInfiniteLoop
+  | getGuardsNextPosition currentGuard `elem` pointsOfInfiniteLoop = iterateThroughObstructionsAlongPath inputStrings (moveGuardForward currentGuard) pointsOfInfiniteLoop
+  | isInfiniteLoop = iterateThroughObstructionsAlongPath inputStrings (moveGuardForward currentGuard) (pointsOfInfiniteLoop ++ [getGuardsPosition currentGuard])
+  | otherwise = iterateThroughObstructionsAlongPath inputStrings (moveGuardForward currentGuard) pointsOfInfiniteLoop
   where
     newPatrolMap = putObstructionAtPoint inputStrings (getGuardsNextPosition currentGuard) 'X'
     isInfiniteLoop = walkGuardWithNewObstructionInfinteLoop currentGuard newPatrolMap [] []
-    currentGuard = if (getCharacterFromPoint inputStrings $ getGuardsNextPosition guard) == '#' then changeGuardDirection guard else guard
+    currentGuard = if ((isPointOutOfBound inputStrings $ getGuardsNextPosition guard) == False) && (getCharacterFromPoint inputStrings $ getGuardsNextPosition guard) == '#' then changeGuardDirection guard else guard
 
 part2 :: IO ()
 part2 = do
   fileContent <- readFile "input/inputday6.txt"
-  let fileLines = lines fileContent
-  -- let fileLines = testCase
+  -- let fileLines = lines fileContent
+  let fileLines = testCase
   let initialGuard = findGuardInitialPosition fileLines 0
   -- let n = nub $ walkGuard initialGuard fileLines [getGuardsPosition initialGuard]
 
-  print $ iterateThroughObstructionsAlongPath fileLines initialGuard 0
+  print $ length $ nub $ iterateThroughObstructionsAlongPath fileLines initialGuard []
