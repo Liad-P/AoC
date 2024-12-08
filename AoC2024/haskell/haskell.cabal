@@ -83,3 +83,8 @@ executable haskell
                     , AoC2024Day4
                     , AoC2024Day5
                     , AoC2024Day6
+                    , AoC2024Day7
+                    , AoC2024Day8
+
+-- library
+--   ghc-options: -O2 -threaded -rtsopts
