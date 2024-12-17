@@ -22,6 +22,15 @@ testCase2 =
       "Program: 0,1,5,4,3,0"
     ]
 
+testCase3 =
+  unlines
+    [ "Register A: 2024",
+      "Register B: 0",
+      "Register C: 0",
+      "",
+      "Program: 0,3,5,4,3,0"
+    ]
+
 data Instruction = Adv | Bxl | Bst | Jnz | Bxc | Out | Bdv | Cdv deriving (Show, Eq)
 
 data Register = A Int | B Int | C Int deriving (Show, Eq)
@@ -109,8 +118,8 @@ iterateThroughInstructions instructions instructionPointer registerA registerB r
 
 part1 :: IO ()
 part1 = do
-  --   fileContent <- readFile "input/inputday17.txt"
-  let fileContent = testCase2
+  fileContent <- readFile "input/inputday17.txt"
+  --   let fileContent = testCase
   let fileLines = lines fileContent
   let (registerText, programText) = span (/= "") fileLines
   let (registerA, registerB, registerC) =
@@ -125,5 +134,33 @@ part1 = do
             Right res -> res
         )
   print program
-  let result = concatMap (\x -> show x) $ iterateThroughInstructions program 0 registerA registerB registerC
+  let resultOutputs = iterateThroughInstructions program 0 registerA registerB registerC
+  print resultOutputs
+  let result = concatMap (\x -> show x) resultOutputs
+
   print result -- 276560231
+
+part2 :: IO ()
+part2 = do
+  fileContent <- readFile "input/inputday17.txt"
+  --   let fileContent = testCase3
+  let fileLines = lines fileContent
+  let (registerText, programText) = span (/= "") fileLines
+  let (registerA, registerB, registerC) =
+        ( case (parse parseRegisters "" (unlines registerText)) of
+            Left _ -> error "failed parsing registers"
+            Right res -> res
+        )
+  print (registerA, registerB, registerC)
+  let program =
+        ( case (parse parseProgram "" (head (tail programText))) of
+            Left x -> error ("failed parsing program" ++ show x)
+            Right res -> res
+        )
+  print program
+
+  let iterateUntilValue i
+        | iterateThroughInstructions program 0 i registerB registerC == program = i
+        | otherwise = iterateUntilValue (i + 1)
+  let result = iterateUntilValue 0
+  print result
