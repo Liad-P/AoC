@@ -1,3 +1,15 @@
 {
-    "python.linting.pylintArgs": ["--rcfile=./.pylintrc"]
+    "python.linting.pylintArgs": ["--rcfile=./.pylintrc"],
+    "java.project.sourcePaths": ["AoC2025/java/src"],
+  "java.project.outputPath": "java/bin",
+  "java.import.generatesMetadataFilesAtProjectRoot": false,
+  "java.autobuild.enabled": true,
+  "java.configuration.updateBuildConfiguration": "automatic",
+  "java.jdt.ls.vmargs": "-Xmx3G -Xms1G",
+  "files.exclude": {
+    "**/.classpath": true,
+    "**/.project": true,
+    "**/.settings": true,
+    "**/.factorypath": true
+  }
 }

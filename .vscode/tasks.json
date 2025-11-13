@@ -1,0 +1,49 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "Build Java",
+            "type": "shell",
+            "command": "javac",
+            "args": [
+                "-d",
+                "${workspaceFolder}/java/bin",
+                "${workspaceFolder}/AoC2025/java/src/Y2025/**/*.java"
+            ],
+            "group": "build",
+            "problemMatcher": []
+        },
+        {
+            "label": "Run Advent of Code Day",
+            "type": "shell",
+            "command": "java",
+            "args": [
+                "-cp",
+                "${workspaceFolder}/java/bin",
+                "Main",
+                "${input:yearNumber}",
+                "${input:dayNumber}"
+            ],
+            "dependsOn": "Build Java",
+            "group": {
+                "kind": "test",
+                "isDefault": true
+            },
+            "problemMatcher": []
+        }
+    ],
+    "inputs": [
+        {
+            "id": "dayNumber",
+            "type": "promptString",
+            "description": "Which day do you want to run?",
+            "default": "1"
+        },
+        {
+            "id": "yearNumber",
+            "type": "promptString",
+            "description": "Which year do you want to run?",
+            "default": "2025"
+        }
+    ]
+}

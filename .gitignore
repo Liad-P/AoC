@@ -5,3 +5,5 @@ AoC2015/haskell/AoC2015/dist-newstyle
 AoC2024/haskell/dist-newstyle
 
 moveAoC2024ToSynthRepo.bash
+
+java/bin/

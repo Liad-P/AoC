@@ -1,0 +1,19 @@
+cabal-version:   3.12
+name:            aoc2025
+version:         0.1.0.0
+license:         MIT
+license-file:    LICENSE
+author:          Liad Peretz
+maintainer:      liad@synthesis.co.za
+build-type:      Simple
+extra-doc-files: CHANGELOG.md
+
+common warnings
+    ghc-options: -Wall
+
+executable aoc2025
+    import:           warnings
+    main-is:          Main.hs
+    build-depends:    base ^>=4.18.3.0
+    hs-source-dirs:   app
+    default-language: Haskell2010
