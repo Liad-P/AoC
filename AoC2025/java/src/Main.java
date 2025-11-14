@@ -17,8 +17,7 @@ public class Main {
 
         try {
             executeDayOfAdvent(year, day);
-        } catch (ClassNotFoundException | InstantiationException | IllegalAccessException | IllegalArgumentException
-                | InvocationTargetException | NoSuchMethodException | SecurityException e) {
+        } catch (Exception e) {
             System.out.println("Unable to run this year and day.");
             e.printStackTrace();
         }
