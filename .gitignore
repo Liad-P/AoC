@@ -7,3 +7,5 @@ AoC2024/haskell/dist-newstyle
 moveAoC2024ToSynthRepo.bash
 
 java/bin/
+
+dist-newstyle/
