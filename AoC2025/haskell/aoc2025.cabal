@@ -18,5 +18,6 @@ executable aoc2025
                       , parsec
     hs-source-dirs:   app, src
     default-language: Haskell2010
-    other-modules:  AoC2025Day1
+    other-modules:  AoC2025Day1,
+                    AoC2025Day2
 
