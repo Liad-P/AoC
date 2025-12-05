@@ -21,5 +21,6 @@ executable aoc2025
     other-modules:  AoC2025Day1,
                     AoC2025Day2,
                     AoC2025Day3,
-                    AoC2025Day4
+                    AoC2025Day4,
+                    AoC2025Day5
 
