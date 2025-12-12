@@ -91,7 +91,6 @@ part1:: IO ()
 part1 = do
     coords <- parseFile "../input/day8.txt" allCoordParser
     let coordsWithId = zip coords [0..(length coords - 1)]
-    -- let possibleComboOfCoords = sortOn fst $ nub [(euclidDistSqrd c1 c2,(id1,id2)) | (c1, id1) <- coordsWithId, (c2, id2) <- coordsWithId, id1 /= id2]
     let possibleComboOfCoords = sortOn fst ([(euclidDistSqrd c1 c2,(id1,id2)) | (c1, id1) <- coordsWithId, (c2, id2) <- coordsWithId, id1 < id2]) -- id1 < id2 prevents duplicates of (id1,id2) and (id2,id1)
     let circuits = foldl (\acc i ->
                     let (_ ,(id1, id2)) = possibleComboOfCoords !! i
@@ -101,5 +100,54 @@ part1 = do
                 M.empty
                 [0..999]
     print $ product $ take 3 $ reverse $ sort $ map (\x -> length $ nub x) $ findCircuitsInGraph circuits
+
+
+setsMerge:: [Set Int] -> Set Int
+setsMerge [] = Set.empty
+setsMerge [x] = x
+setsMerge [x,y] = Set.union x y
+setsMerge (x:xs) = Set.union x $ setsMerge xs
+
+goThroughSetsAnInsertIds:: [Set Int] -> [Set Int] -> (Int,Int) -> [Set Int]
+-- Case 1: id1 and id2 were not part of any existing sets
+goThroughSetsAnInsertIds [] [] (id1,id2) = [Set.fromList [id1, id2]]
+-- Case 2: Only one of the ids was already part of a merge set, so so add a final 
+goThroughSetsAnInsertIds [] [ms] (id1,id2) = [Set.union ms (Set.fromList [id1,id2])]
+-- Case 3: There are 2 merge sets, meaning both ids are part of different sets. Therefore merge these 2 different sets
+goThroughSetsAnInsertIds sets [ms1,ms2] (id1,id2) = Set.union ms1 ms2 : sets
+goThroughSetsAnInsertIds currentSets setsToMerge (id1,id2)
+    -- Case: Might not be needed because of case 3
+    | length newSetsToMerge >= 2 = setsMerge newSetsToMerge : tailSets
+    -- Case 4: both ids already belong to the same set, therefore early exit and dont merge anything
+    | Set.member id1 currentSet && Set.member id2 currentSet = currentSets
+    -- Case 5: There has been a new merge set added, therefore note down this merge set to merge later
+    | length newSetsToMerge > length setsToMerge = goThroughSetsAnInsertIds tailSets newSetsToMerge (id1,id2)
+    -- Case 6: If nothing, carry on iterating through 
+    | otherwise = currentSet : goThroughSetsAnInsertIds tailSets newSetsToMerge (id1,id2)
+    where
+        currentSet = head currentSets
+        tailSets = tail currentSets
+        newSetsToMerge =
+            if Set.member id1 currentSet || Set.member id2 currentSet then setsToMerge ++ [currentSet]
+            else setsToMerge
+
+
+part2:: IO ()
+part2 = do
+    coords <- parseFile "../input/day8.txt" allCoordParser
+    let coordsWithId = zip coords [0..(length coords - 1)]
+    let possibleComboOfCoords = sortOn fst ([(euclidDistSqrd c1 c2,(id1,id2)) | (c1, id1) <- coordsWithId, (c2, id2) <- coordsWithId, id1 < id2]) -- id1 < id2 prevents duplicates of (id1,id2) and (id2,id1)
+    let circuits = foldM (\(accSet) i ->
+                    let (_ ,(id1, id2)) = possibleComboOfCoords !! i
+                        newSets = goThroughSetsAnInsertIds accSet [] (id1, id2)
+                    in
+                        if length newSets == 1 && Set.size (head newSets) == length coords then Left (id1, id2)
+                        else Right newSets
+                )
+                []
+                [0..(length possibleComboOfCoords -1)]
+    print $  case circuits of
+        Left (id1, id2) -> show $ (\(x,_,_) -> x) (coords !! id1) * (\(x,_,_) -> x) (coords !! id2)
+        Right _ -> "this shouldnt happen"
 
 
