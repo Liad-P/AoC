@@ -25,5 +25,6 @@ executable aoc2025
                     AoC2025Day4,
                     AoC2025Day5,
                     AoC2025Day6,
-                    AoC2025Day8
+                    AoC2025Day8,
+                    AoC2025Day9
 
